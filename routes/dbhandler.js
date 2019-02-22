@@ -4,11 +4,9 @@ var assert = require('assert');
 var url = require('url');
 var host="localhost";
 var port="27017";
-var Urls = 'mongodb://localhost:27017/classweb';
-// classweb  ===> 自动创建一个
+var Urls = 'mongodb://localhost:27017/OWM-db';
  
- 
-//add一条数据 
+//add
 var add = function(db,collections,selector,fn){
   var collection = db.collection(collections);
   collection.insertMany([selector],function(err,result){
@@ -23,6 +21,7 @@ var add = function(db,collections,selector,fn){
     db.close();
   });
 }
+
 //delete
 var deletes = function(db,collections,selector,fn){
   var collection = db.collection(collections);
@@ -39,6 +38,7 @@ var deletes = function(db,collections,selector,fn){
     db.close;
   });
 };
+
 //find
 var find = function(db,collections,selector,fn){
   //collections="hashtable";
@@ -59,7 +59,6 @@ var find = function(db,collections,selector,fn){
  
 }
  
- 
 //update
 var updates = function(db,collections,selector,fn){
   var collection = db.collection(collections);
@@ -78,6 +77,7 @@ var updates = function(db,collections,selector,fn){
   });
  
 }
+
 var methodType = {
     // 项目所需
   login:find,
@@ -94,9 +94,10 @@ var methodType = {
   showCourse:find,
   register:add
 };
+
 //主逻辑    服务器  ， 请求    --》 
 // req.route.path ==》 防止前端的请求 直接操作你的数据库
-module.exports = function(req,res,collections,selector,fn){
+module.exports = function(req, res ,collections, selector, fn){
   MongoClient.connect(Urls, function(err, db) {
     assert.equal(null, err);
     console.log("Connected correctly to server");

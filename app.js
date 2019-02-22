@@ -11,11 +11,11 @@ var app = express();
 //session
 var session=require('express-session');
 app.use(session({
-secret:'owm',               //设置 session 签名
-name:'online-work-management',
-cookie:{maxAge:60*1000*60*24}, // 储存的时间 24小时
-resave:false,             // 每次请求都重新设置session
-saveUninitialized:true
+  secret:'owm',               //设置 session 签名
+  name:'online-work-management',
+  cookie:{maxAge:60*1000*60*24}, // 储存的时间 24小时
+  resave:false,             // 每次请求都重新设置session
+  saveUninitialized:true
 }));
 
 // view engine setup
