@@ -2,18 +2,18 @@ const userModel = require('../model/user')
 
 const login  = (req, res) => {
   let {username, password, status} = req.body
-  userModel.findUser({username}, (result) => {
-    if (!result) {
+  userModel.findUser({username}, (err, user) => {
+    if (!user) {
       res.json({
         code: 200,
         msg: '用户名不存在'
       })
     } else {
-      if (result.password == password) {
+      if (user.password == password) {
         res.cookie('user', username)
         res.json({
           code: 200,
-          mag: '登录成功！'
+          msg: '登录成功！'
         })
       } else {
         res.json({
@@ -25,10 +25,30 @@ const login  = (req, res) => {
   })
 }
 
-const signUp = (req, res) => {
-
+const register = (req, res) => {
+  let {username, password} = req.body
+  // 检查是否用户名已存在
+  userModel.findUser({username}, (user) => {
+    if (user) {
+      res.json({
+        code: 200,
+        msg: '用户名已存在'
+      })
+    } else {
+      userModel.insertUser({username, password},(result) => {
+        !result? res.json({
+          code: 200,
+          msg: "error: "+err
+        }) : res.json({
+          code: 200,
+          msg: '注册成功！'
+        })
+      })
+    }
+  })
 }
 
 module.exports = {
-  login
+  login,
+  register
 }

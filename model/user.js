@@ -7,23 +7,23 @@ const mongoose = require('../utils/dbhandler')
 const User = mongoose.model('user', {
   username: String,
   password: String,
-  // isLogin: Boolean
+  isLogin: Boolean
 })
 
 // 查找
 const findUser = (userInfo, callback) => {
-  User.findOne(userInfo).then((err, res) => {
-    if (err) {
-      callback(err)
-    } else {
-      callback(res)
-    }
+  User.findOne(userInfo).then((res) => {
+    callback(res)
   })
 }
 
 // 添加
 const insertUser = (userInfo, callback) => {
-  let user = new User(userInfo)
+  let user = new User({
+    username: userInfo.username,
+    password: userInfo.password,
+    isLogin: false
+  })
   user.save().then((err, res) => {
     if (err) {
       callback(err)
