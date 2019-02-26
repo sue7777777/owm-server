@@ -98,7 +98,7 @@ var methodType = {
 //主逻辑    服务器  ， 请求    --》 
 // req.route.path ==》 防止前端的请求 直接操作你的数据库
 module.exports = function(req, res ,collections, selector, fn){
-  MongoClient.connect(Urls, function(err, db) {
+  MongoClient.connect(Urls, {useNewUrlParser: true}, function(err, db) {
     assert.equal(null, err);
     console.log("Connected correctly to server");
     // 根据 请求的地址来确定是什么操作  （为了安全，避免前端直接通过请求url操作数据库）
