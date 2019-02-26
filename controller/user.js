@@ -2,7 +2,7 @@ const userModel = require('../model/user')
 
 const login  = (req, res) => {
   let {username, password, status} = req.body
-  userModel.findUser({username}, (err, user) => {
+  userModel.findUser({username}, (user) => {
     if (!user) {
       res.json({
         code: 200,
