@@ -5,18 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/user');
 
 var app = express();
-//session
-var session=require('express-session');
-app.use(session({
-  secret:'owm',               //设置 session 签名
-  name:'online-work-management',
-  cookie:{maxAge:60*1000*60*24}, // 储存的时间 24小时
-  resave:false,             // 每次请求都重新设置session
-  saveUninitialized:true
-}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,9 +20,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 为对应routes设置路由
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
-app.use('/users/login', usersRouter)
+app.use('/api', indexRouter)
+app.use('/api/user', usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
