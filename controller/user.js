@@ -5,19 +5,19 @@ const login  = (req, res) => {
   userModel.findUser({username}, (user) => {
     if (!user) {
       res.json({
-        code: 200,
+        code: 1,
         msg: '用户名不存在'
       })
     } else {
       if (user.password == password) {
         res.cookie('user', username)
         res.json({
-          code: 200,
+          code: 0,
           msg: '登录成功！'
         })
       } else {
         res.json({
-          code: 200,
+          code: 2,
           msg: '密码错误'
         })
       }
@@ -31,16 +31,16 @@ const register = (req, res) => {
   userModel.findUser({username}, (user) => {
     if (user) {
       res.json({
-        code: 200,
+        code: 3,
         msg: '用户名已存在'
       })
     } else {
       userModel.insertUser({username, password},(result) => {
         !result? res.json({
-          code: 200,
+          code: 9,
           msg: "error: "+err
         }) : res.json({
-          code: 200,
+          code: 0,
           msg: '注册成功！'
         })
       })
