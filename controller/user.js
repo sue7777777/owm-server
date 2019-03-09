@@ -26,7 +26,7 @@ const login  = (req, res) => {
 }
 
 const register = (req, res) => {
-  let {username, password} = req.body
+  let {username, password, identify, usernumber} = req.body
   // 检查是否用户名已存在
   userModel.findUser({username}, (user) => {
     if (user) {
@@ -35,7 +35,7 @@ const register = (req, res) => {
         msg: '用户名已存在'
       })
     } else {
-      userModel.insertUser({username, password},(result) => {
+      userModel.insertUser({username, password, identify, usernumber} ,(result) => {
         !result? res.json({
           code: 9,
           msg: "error: "+err
