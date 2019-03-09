@@ -40,9 +40,18 @@ const insertUser = (userInfo, callback) => {
 }
 
 // 修改密码
-
+const changeUserPwd = (userInfo, callback) => {
+  User.updateOne({username: userInfo.username}, {password: userInfo.newPassword}).then((err, res) => {
+    if (err) {
+      callback(err)
+    } else {
+      callback(res)
+    }
+  })
+}
 
 module.exports = {
   findUser,
-  insertUser
+  insertUser,
+  changeUserPwd
 }
