@@ -1,8 +1,8 @@
 const userModel = require('../model/user')
 
 const login  = (req, res) => {
-  let {username, password, status} = req.body
-  userModel.findUser({username}, (user) => {
+  let {userName, password, status} = req.body
+  userModel.findUser({userName}, (user) => {
     if (!user) {
       res.json({
         code: -1,
@@ -10,10 +10,16 @@ const login  = (req, res) => {
       })
     } else {
       if (user.password == password) {
-        res.cookie('user', username)
+        res.cookie('user', userName)
         res.json({
           code: 1,
-          msg: '登录成功！'
+          msg: '登录成功！',
+          result: {
+            userName: user.userName,
+            identify: user.identify,
+            usernumber: user.usernumber,
+            avatar: user.avatar
+          }
         })
       } else {
         res.json({
@@ -26,16 +32,16 @@ const login  = (req, res) => {
 }
 
 const register = (req, res) => {
-  let {username, password, identify, usernumber} = req.body
+  let {userName, password, identify, usernumber, avatar} = req.body
   // 检查是否用户名已存在
-  userModel.findUser({username}, (user) => {
+  userModel.findUser({userName}, (user) => {
     if (user) {
       res.json({
         code: -1,
         msg: '用户名已存在'
       })
     } else {
-      userModel.insertUser({username, password, identify, usernumber} ,(result) => {
+      userModel.insertUser({userName, password, identify, usernumber, avatar} ,(result) => {
         !result? res.json({
           code: -1,
           msg: "error: "+err
@@ -49,11 +55,9 @@ const register = (req, res) => {
 }
 
 const changePwdWithUserNumber = (req, res) => {
-  let { username, usernumber, newPassword } = req.body
-  console.log(req.body)
+  let { userName, usernumber, newPassword } = req.body
   // 检查用户名和学号是否匹配
-  userModel.findUser({username}, (user) => {
-    console.log(user)
+  userModel.findUser({userName}, (user) => {
     if (!user) {
       res.json({
         code: -1,
@@ -66,7 +70,7 @@ const changePwdWithUserNumber = (req, res) => {
           msg: '职工号或学号不匹配'
         })
       } else {
-        userModel.changeUserPwd({username, newPassword}, (result) => {
+        userModel.changeUserPwd({userName, newPassword}, (result) => {
           !result? res.json({
             code: -1,
             msg: "error: "+err
@@ -80,8 +84,33 @@ const changePwdWithUserNumber = (req, res) => {
   })
 }
 
+const getUserInfo = (req, res) => {
+  // 根据userName获取全部用户信息
+  let { userName } = req.query
+  userModel.findUser({ userName }, (user) => {
+    if (!res) {
+      res.json({
+        code: -1,
+        msg: '用户不存在'
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: '成功',
+        result: {
+          userName: user.userName,
+          identify: user.identify,
+          usernumber: user.usernumber,
+          avatar: user.avatar
+        }
+      })
+    }
+  })
+}
+
 module.exports = {
   login,
   register,
-  changePwdWithUserNumber
+  changePwdWithUserNumber,
+  getUserInfo
 }

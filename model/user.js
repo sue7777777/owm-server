@@ -5,10 +5,11 @@ const mongoose = require('../utils/dbhandler')
  * 参数2： 字段的类型对象（配置项）
  */
 const User = mongoose.model('user', {
-  username: String,   // 用户名
+  userName: String,   // 用户名
   password: String,   // 密码
   identify: Number,   // 身份： 1-老师， 2-学生
-  usernumber: String  // 用户唯一标识，老师是职工号，学生是学号
+  usernumber: String, // 用户唯一标识，老师是职工号，学生是学号
+  avatar: String      // 头像图片
 })
 
 // 查找
@@ -25,10 +26,11 @@ const findUser = (userInfo, callback) => {
 // 添加
 const insertUser = (userInfo, callback) => {
   let user = new User({
-    username: userInfo.username,
+    userName: userInfo.userName,
     password: userInfo.password,
     identify: userInfo.identify,
-    usernumber: userInfo.usernumber
+    usernumber: userInfo.usernumber,
+    avatar: userInfo.avatar
   })
   user.save().then((err, res) => {
     if (err) {
@@ -41,7 +43,7 @@ const insertUser = (userInfo, callback) => {
 
 // 修改密码
 const changeUserPwd = (userInfo, callback) => {
-  User.updateOne({username: userInfo.username}, {password: userInfo.newPassword}).then((err, res) => {
+  User.updateOne({userName: userInfo.userName}, {password: userInfo.newPassword}).then((err, res) => {
     if (err) {
       callback(err)
     } else {
