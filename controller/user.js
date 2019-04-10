@@ -1,7 +1,7 @@
 const userModel = require('../model/user')
 
 const login  = (req, res) => {
-  let {userName, password, status} = req.body
+  let {userName, password} = req.body
   userModel.findUser({userName}, (user) => {
     if (!user) {
       res.json({

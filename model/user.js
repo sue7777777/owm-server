@@ -14,7 +14,7 @@ const User = mongoose.model('user', {
 
 // 查找
 const findUser = (userInfo, callback) => {
-  User.findOne(userInfo).then((err, res) => {
+  User.findOne(userInfo, {_id: 0}).then((err, res) => {
     if (err) {
       callback(err)
     } else {
