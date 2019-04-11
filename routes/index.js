@@ -18,5 +18,9 @@ router.get('/user/getUserInfo', userController.getUserInfo)
 // form
 router.get('/form/getFormList', formController.getFormList)
 router.post('/form/createForm', formController.createForm)
+router.post('/form/deleteForm', formController.deleteForm)
+router.post('/form/copyForm', formController.copyForm)
+router.post('/form/saveForm', formController.saveForm)
+router.post('/form/publishForm', formController.publishForm)
 
 module.exports = router;

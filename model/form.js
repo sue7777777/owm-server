@@ -5,7 +5,7 @@ const Form = mongoose.model('form', {
     CreaterID: String,          // 创建者id
     Direction: String,          // 来源-保留字段
     ExpireTimestamp: Number,    // 过期时间戳 ms
-    ExtraSubmitterInfos: Object,// 额外的提交者信息-保留字段
+    ExtraSubmitterInfos: Array,// 额外的提交者信息-保留字段
     FormID: Number,             // 作业id
     IsReplied: Boolean,         // 是否有人回复
     Name: String,               // 作业标题
@@ -84,16 +84,62 @@ const createForm = (formInfo, callback) => {
 
 // 删除作业
 const deleteForm = (FormID, callback) => {
-    Form.findByIdAndDelete(FormID).then((res) => {
+    Form.findOneAndDelete(FormID).then((res) => {
         callback(res)
     }).catch((err) => {
         callback(err)
     })
 }
 
+// 更新作业问题
+const saveForm = (FormID, update, callback) => {
+    Form.updateOne(FormID, update).then((res) => {
+        Form.findOne(FormID, {_id: 0}).then((form) => {
+            form = form.toObject()
+            delete form.__v
+            callback(form)
+        }).catch((err) => callback(err))
+    }).catch((err) => {
+        callback(err)
+    })
+}
+
+// 复制作业
+const copyForm = (FormID, callback) => {
+    Form.findOne(FormID, {_id: 0}).then((res) => {
+        let form = res.toObject()
+        delete form.__v
+        getNewFormId().then((res) => {
+            form.FormID = res
+            form.Status = 'draft'
+            console.log(form)
+            new Form(form).save().then((res) => {
+                if (res) {
+                    callback(form)
+                }
+            }).catch((err) => callback(err))
+        }).catch((err) => callback(err))
+    }).catch((err) => callback(err))
+}
+
+// 发布作业
+const publishForm = (updateInfo, callback) => {
+    let update = {
+        ExpireTimestamp : updateInfo.ExpireTimestamp,
+        Status: 'published',
+        UpdaterID: updateInfo.userName
+    }
+    Form.updateOne({FormID:updateInfo.FormID}, update)
+    .then((res) => callback(res))
+    .catch((err) => callback(err))
+}
+
 module.exports = {
     findForm,
+    getFormList,
     createForm,
     deleteForm,
-    getFormList
+    saveForm,
+    copyForm,
+    publishForm
 }
