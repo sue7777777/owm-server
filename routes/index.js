@@ -1,13 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var userController = require('../controller/user')
-var formController = require('../controller/form')
-
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express' });
-// });
+const userController = require('../controller/user')
+const formController = require('../controller/form')
+const transationController = require('../controller/transation')
 
 // user
 router.post('/user/login', userController.login)
@@ -22,5 +18,10 @@ router.post('/form/deleteForm', formController.deleteForm)
 router.post('/form/copyForm', formController.copyForm)
 router.post('/form/saveForm', formController.saveForm)
 router.post('/form/publishForm', formController.publishForm)
+
+// transation
+router.get('/transation/getTransations', transationController.getTransations)
+router.get('/transation/getTransationNumber', transationController.getTransationNumber)
+router.get('/transation/createTransation', transationController.createTransation)
 
 module.exports = router;
