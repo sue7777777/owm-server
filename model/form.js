@@ -31,9 +31,9 @@ function getNewFormId () {
     })
 }
 
-// 根据用户id获取作业list (CreateID)
-const getFormList = (CreateID, callback) => {
-    Form.find(CreateID, { _id:0 }).then((res) => {
+// 根据用户id获取作业list (CreaterID)
+const getFormList = (CreaterID, callback) => {
+    Form.find(CreaterID, { _id:0 }).then((res) => {
         // 过滤 __v
         callback(res.map((form) => {
             form = form.toObject()
@@ -43,6 +43,17 @@ const getFormList = (CreateID, callback) => {
     }).catch((err) => {
         callback(err)
     })
+}
+
+// 通过form名模糊查询
+const findFormByName = (query, callback) => {
+    Form.find({Name: {$regex: query.Name}, CreaterID: query.userName}, {_id: 0}).then(res => {
+        callback(res.map((form) => {
+            form = form.toObject()
+            delete form.__v
+            return form
+        }))
+    }).catch(err => callback({error: err}))
 }
 
 // 查找对应id作业
@@ -136,6 +147,7 @@ const publishForm = (updateInfo, callback) => {
 
 module.exports = {
     findForm,
+    findFormByName,
     getFormList,
     createForm,
     deleteForm,

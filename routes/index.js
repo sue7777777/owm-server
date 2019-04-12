@@ -13,6 +13,7 @@ router.get('/user/getUserInfo', userController.getUserInfo)
 
 // form
 router.get('/form/getFormList', formController.getFormList)
+router.get('/form/getSearchList', formController.getSearchList)
 router.post('/form/createForm', formController.createForm)
 router.post('/form/deleteForm', formController.deleteForm)
 router.post('/form/copyForm', formController.copyForm)

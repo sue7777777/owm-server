@@ -160,8 +160,42 @@ const publishForm = (req, res) => {
     })
 }
 
+const getSearchList = (req,res) => {
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: '用户未登录'
+        })
+    }
+
+    let {skip, limit, namekeyword} = req.query
+    formModel.findFormByName({userName, Name: namekeyword}, (queryRes) => {
+        if(queryRes.error) {
+            res.json({
+                code: -1,
+                msg: '失败'
+            })
+        } else {
+            let list = queryRes
+            if(limit && limit > 0) {
+                list = tools.Page(queryRes, limit, skip)
+            }
+            res.json({
+                code: 1,
+                msg: '成功',
+                data: {
+                    List: list,
+                    Total: queryRes.length
+                }
+            })
+        }
+    })
+}
+
 module.exports = {
     getFormList,
+    getSearchList,
     createForm,
     deleteForm,
     copyForm,
