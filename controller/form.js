@@ -1,6 +1,32 @@
 const formModel = require('../model/form')
 const tools = require('../utils/tools')
 
+const getForm = (req, res) => {
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: '用户未登录'
+        })
+    } 
+
+    let {FormID} = req.query
+    formModel.findForm({FormID}, (form) => {
+        if (form.error) {
+            res.json({
+                code: -1,
+                msg: '作业不存在'
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: '成功',
+                data: form
+            })
+        }
+    })
+}
+
 const getFormList = (req, res) => {
     let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
     if (!userName) {
@@ -136,6 +162,42 @@ const saveForm = (req, res) => {
     })
 }
 
+// 通过index更新问题内容
+const updateQuestions = (req, res) => {
+    let {type, FormID, index, data} = req.body
+    if(type === 'insert') {
+        formModel.insertQuestion({FormID, data: JSON.parse(data)}, (insertRes) => {
+            if (insertRes.error) {
+                res.json({
+                    code: -1,
+                    msg: '失败'
+                })
+            } else {
+                res.json({
+                    code: 1,
+                    msg: '成功',
+                    data: 'success'
+                })
+            }
+        })
+    } else {
+        formModel.updateQuestion({FormID, index, data: JSON.parse(data)}, updateRes => {
+            if (updateRes.error) {
+                res.json({
+                    code: -1,
+                    msg: '失败'
+                })
+            } else {
+                res.json({
+                    code: 1,
+                    msg: '成功',
+                    data: 'success'
+                })
+            }
+        })
+    }
+}
+
 const publishForm = (req, res) => {
     let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
     if (!userName) {
@@ -194,11 +256,13 @@ const getSearchList = (req,res) => {
 }
 
 module.exports = {
+    getForm,
     getFormList,
     getSearchList,
     createForm,
     deleteForm,
     copyForm,
     saveForm,
-    publishForm
+    publishForm,
+    updateQuestions
 }

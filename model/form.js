@@ -58,10 +58,12 @@ const findFormByName = (query, callback) => {
 
 // 查找对应id作业
 const findForm = (FromID, callback) => {
-    Form.findOne(FromID).then((res) => {
-        callback(res)
+    Form.findOne(FromID, {_id: 0}).then((res) => {
+        let form = res.toObject()
+        delete form.__v
+        callback(form)
     }).catch((err) => {
-        callback(err)
+        callback({error: err})
     })
 }
 
@@ -102,7 +104,7 @@ const deleteForm = (FormID, callback) => {
     })
 }
 
-// 更新作业问题
+// 更新作业
 const saveForm = (FormID, update, callback) => {
     Form.updateOne(FormID, update).then((res) => {
         Form.findOne(FormID, {_id: 0}).then((form) => {
@@ -145,6 +147,23 @@ const publishForm = (updateInfo, callback) => {
     .catch((err) => callback(err))
 }
 
+// 更新问题（新增）
+const insertQuestion = (update, callback) => {
+    Form.updateOne({FormID: update.FormID}, {$push: {Questions: update.data}}).then(res => callback(res))
+    .catch(err => callback({error: err}))
+}
+
+// 更新问题（修改）
+const updateQuestion = (update, callback) => {
+    Form.findOne({FormID: update.FormID}).then((form) => {
+        let data = form.toObject()
+        data.Questions[update.index] = update.data
+        Form.updateOne({FormID: update.FormID}, data)
+        .then(res => callback(res))
+        .catch(err => callback({error: err}))
+    }).catch(err => callback({error: err}))
+}
+
 module.exports = {
     findForm,
     findFormByName,
@@ -153,5 +172,7 @@ module.exports = {
     deleteForm,
     saveForm,
     copyForm,
-    publishForm
+    publishForm,
+    insertQuestion,
+    updateQuestion
 }

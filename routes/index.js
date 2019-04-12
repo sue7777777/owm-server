@@ -12,6 +12,7 @@ router.post('/user/forgetPassword', userController.changePwdWithUserNumber)
 router.get('/user/getUserInfo', userController.getUserInfo)
 
 // form
+router.get('/form/getForm', formController.getForm)
 router.get('/form/getFormList', formController.getFormList)
 router.get('/form/getSearchList', formController.getSearchList)
 router.post('/form/createForm', formController.createForm)
@@ -19,6 +20,7 @@ router.post('/form/deleteForm', formController.deleteForm)
 router.post('/form/copyForm', formController.copyForm)
 router.post('/form/saveForm', formController.saveForm)
 router.post('/form/publishForm', formController.publishForm)
+router.post('/form/updateQuestions', formController.updateQuestions)
 
 // transation
 router.get('/transation/getTransations', transationController.getTransations)
