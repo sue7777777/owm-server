@@ -12,10 +12,8 @@ const Cookie = {
 }
 
 const Page = (array, limit, skip) => {
-  console.log(array)
-  return array
-  // let offset = (skip - 1) * limit
-  // return (offset + limit >= array.length) ? array.slice(offset, array.length) : array.slice(offset, offset + limit)
+  let offset = skip * limit
+  return (offset + limit >= array.length) ? array.slice(offset, array.length) : array.slice(offset, offset + limit)
 }
 
 module.exports = {

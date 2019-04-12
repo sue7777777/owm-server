@@ -20,7 +20,7 @@ const Transation = mongoose.model('transation', {
 
 // 根据formid获取作业的回复列表
 const getTransations = (queryArr, callback) => {
-    Transation.find({FormID: queryArr.FormID, Status: {$ne: {Status: queryArr.neStatus}}}, {_id: 0}).then((res) => {
+    Transation.find({FormID: queryArr.FormID, Status: {$ne: queryArr.neStatus}}, {_id: 0}).then((res) => {
         callback(res.map((transation) => {
             transation = transation.toObject()
             delete transation.__v
@@ -30,7 +30,7 @@ const getTransations = (queryArr, callback) => {
 }
 
 const getTransationsNumber = (FormID, callback) => {
-    Transation.find(FormID).then((res) => {
+    Transation.find({FormID: FormID, Status: {$ne: 'unsubmitted'}}).then((res) => {
         if (res.length > 0){
             callback({
                 count: res.length,

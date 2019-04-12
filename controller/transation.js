@@ -13,9 +13,8 @@ const getTransations = (req, res) => {
                 msg: '参数错误'
             })
         } else {
-            let pageList = []
+            let pageList = list
             if (limit && limit > 0) {
-                console.log('page')
                 // 分页
                 pageList = tools.Page(list, limit, skip)
             }
@@ -33,7 +32,7 @@ const getTransations = (req, res) => {
 
 const getTransationNumber = (req, res) => {
     let {FormID} = req.query
-    transationModel.getTransationsNumber({FormID}, (TransationNum) => {
+    transationModel.getTransationsNumber(FormID, (TransationNum) => {
         if (!TransationNum) {
             res.json({
                 code: -1,
