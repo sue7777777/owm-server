@@ -8,11 +8,11 @@ mongoose.connect(DB_URL, {useNewUrlParser: true}, (err) => {
   if(err){
     console.log('Connection Error:' + err)
   }else{
-    console.log('Connection success!') }
+    console.log('Connection SUCCESS!') }
 })
 
 /**
-  * 连接成功
+  * 连接SUCCESS
   */
 mongoose.connection.on('connected', function () {    
     console.log('Mongoose connection open to ' + DB_URL)

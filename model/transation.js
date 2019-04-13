@@ -73,8 +73,24 @@ const createTransation = (transationInfo, callback) => {
     })
 }
 
+const updateTransation = (update, callback) => {
+    let {FormID, TransationID, data} = update
+    formModel.findForm({FormID}).then(form => {
+        let expire = form.toObject().ExpireTimestamp
+        if (Date.now().getTime() > expire) {
+            // 过期的提示已过期
+            callback({error: err, msg: 'submit time expired'})
+        } else {
+            Transation.updateOne({FormID, TransationID}, {...data})
+            .then(res => callback(res))
+            .catch(err => callback({error: err}))
+        }
+    }).catch(err => callback({error: err}))
+}
+
 module.exports = {
     getTransations,
     getTransationsNumber,
-    createTransation
+    createTransation,
+    updateTransation
 }

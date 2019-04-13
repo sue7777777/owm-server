@@ -26,5 +26,6 @@ router.post('/form/updateQuestions', formController.updateQuestions)
 router.get('/transation/getTransations', transationController.getTransations)
 router.get('/transation/getTransationNumber', transationController.getTransationNumber)
 router.get('/transation/createTransation', transationController.createTransation)
+router.post('/transation/updateTransation', transationController.updateTransation)
 
 module.exports = router;

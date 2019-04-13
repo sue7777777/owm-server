@@ -20,7 +20,7 @@ const getTransations = (req, res) => {
             }
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: {
                     List: pageList,
                     Total: list.length
@@ -41,7 +41,7 @@ const getTransationNumber = (req, res) => {
         } else {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: TransationNum
             })
         }
@@ -49,12 +49,20 @@ const getTransationNumber = (req, res) => {
 }
 
 const createTransation = (req, res) => {
-    let {FormID, userName} = req.query
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: 'NO_LOGIN'
+        })
+    }
+
+    let {FormID} = req.query
     transationModel.createTransation({FormID, userName}, (data) => {
         if (data) {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: data
             })
         } else {
@@ -66,8 +74,36 @@ const createTransation = (req, res) => {
     })
 }
 
+const updateTransation = (req, res) => {
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: 'NO_LOGIN'
+        })
+    }
+
+    let {FormID, TransationID, data} = req.body
+    transationModel.updateTransation({FormID, TransationID, data}, updateRes => {
+        if (updateRes.error) {
+            res.json({
+                code: -1,
+                msg: 'FAILED',
+                data: updateRes.msg || ''
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: 'SUCCESS',
+                data: ''
+            })
+        }
+    })
+}
+
 module.exports = {
     getTransations,
     getTransationNumber,
-    createTransation
+    createTransation,
+    updateTransation
 }

@@ -6,7 +6,7 @@ const getForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     } 
 
@@ -20,7 +20,7 @@ const getForm = (req, res) => {
         } else {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: form
             })
         }
@@ -32,7 +32,7 @@ const getFormList = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -45,7 +45,7 @@ const getFormList = (req, res) => {
         } else {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: {
                     List: list,
                     Total: list.length
@@ -60,7 +60,7 @@ const createForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -71,12 +71,12 @@ const createForm = (req, res) => {
         if (!createRes.FormID) {
             res.json({
                 code: -1,
-                msg: '创建失败！'
+                msg: 'FAILED！'
             })
         } else {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: createRes
             })
         }
@@ -88,7 +88,7 @@ const deleteForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -102,7 +102,7 @@ const deleteForm = (req, res) => {
         } else {
             res.json({
                 code: 1,
-                msg: '成功'
+                msg: 'SUCCESS'
             })
         }
     })
@@ -113,7 +113,7 @@ const copyForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -122,12 +122,12 @@ const copyForm = (req, res) => {
         if (!copyRes.FormID) {
             res.json({
                 code: -1,
-                msg: '复制失败'
+                msg: 'FAILED'
             })
         } else {
             res.json({
                 code: 1,
-                msg: '成功'
+                msg: 'SUCCESS'
             })
         }
     })
@@ -138,7 +138,7 @@ const saveForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -150,12 +150,12 @@ const saveForm = (req, res) => {
         if (!updateRes) {
             res.json({
                 code: -1,
-                msg: '更新失败'
+                msg: 'FAILED'
             })
         } else {
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: updateRes
             })
         }
@@ -166,32 +166,32 @@ const saveForm = (req, res) => {
 const updateQuestions = (req, res) => {
     let {type, FormID, index, data} = req.body
     if(type === 'insert') {
-        formModel.insertQuestion({FormID, data: JSON.parse(data)}, (insertRes) => {
+        formModel.insertQuestion({FormID, data: data}, (insertRes) => {
             if (insertRes.error) {
                 res.json({
                     code: -1,
-                    msg: '失败'
+                    msg: 'FAILED'
                 })
             } else {
                 res.json({
                     code: 1,
-                    msg: '成功',
-                    data: 'success'
+                    msg: 'SUCCESS',
+                    data: 'SUCCESS'
                 })
             }
         })
     } else {
-        formModel.updateQuestion({FormID, index, data: JSON.parse(data)}, updateRes => {
+        formModel.updateQuestion({FormID, index, data: data}, updateRes => {
             if (updateRes.error) {
                 res.json({
                     code: -1,
-                    msg: '失败'
+                    msg: 'FAILED'
                 })
             } else {
                 res.json({
                     code: 1,
-                    msg: '成功',
-                    data: 'success'
+                    msg: 'SUCCESS',
+                    data: 'SUCCESS'
                 })
             }
         })
@@ -203,7 +203,7 @@ const publishForm = (req, res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
     let {FormID, ExpireTimestamp} = req.body
@@ -211,12 +211,12 @@ const publishForm = (req, res) => {
         if (!updateRes) {
             res.json({
                 code: -1,
-                msg: '发布失败'
+                msg: 'FAILED'
             })
         } else {
             res.json({
                 code: 1,
-                msg: '成功'
+                msg: 'SUCCESS'
             })
         }
     })
@@ -227,7 +227,7 @@ const getSearchList = (req,res) => {
     if (!userName) {
         res.json({
             code: -1,
-            msg: '用户未登录'
+            msg: 'NO_LOGIN'
         })
     }
 
@@ -236,7 +236,7 @@ const getSearchList = (req,res) => {
         if(queryRes.error) {
             res.json({
                 code: -1,
-                msg: '失败'
+                msg: 'FAILED'
             })
         } else {
             let list = queryRes
@@ -245,7 +245,7 @@ const getSearchList = (req,res) => {
             }
             res.json({
                 code: 1,
-                msg: '成功',
+                msg: 'SUCCESS',
                 data: {
                     List: list,
                     Total: queryRes.length
