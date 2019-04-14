@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 const Cookie = {
   get: (cookie, key) => {
     let cookies = cookie.indexOf(';') > 0? cookie.split(';') : [cookie]
@@ -16,7 +18,13 @@ const Page = (array, limit, skip) => {
   return (offset + limit >= array.length) ? array.slice(offset, array.length) : array.slice(offset, offset + limit)
 }
 
+const toMD5 = (str) => {
+  let md5 = crypto.createHash('md5')
+  return md5.update(str).digest('hex')
+}
+
 module.exports = {
   Cookie,
-  Page
+  Page,
+  toMD5
 }

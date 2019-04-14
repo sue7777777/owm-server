@@ -4,6 +4,7 @@ const router = express.Router();
 const userController = require('../controller/user')
 const formController = require('../controller/form')
 const transationController = require('../controller/transation')
+const fileController = require('../controller/file')
 
 // user
 router.post('/user/login', userController.login)
@@ -27,5 +28,9 @@ router.get('/transation/getTransations', transationController.getTransations)
 router.get('/transation/getTransationNumber', transationController.getTransationNumber)
 router.get('/transation/createTransation', transationController.createTransation)
 router.post('/transation/updateTransation', transationController.updateTransation)
+
+// file
+router.get('/file/getFile', fileController.getFile)
+router.post('/file/postFile', fileController.uploadFile)
 
 module.exports = router;

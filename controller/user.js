@@ -13,7 +13,7 @@ const login  = (req, res) => {
         res.cookie('user', userName)
         res.json({
           code: 1,
-          msg: '登录SUCCESS！',
+          msg: 'SUCCESS',
           result: {
             userName: user.userName,
             identify: user.identify,
@@ -47,7 +47,7 @@ const register = (req, res) => {
           msg: "error: "+err
         }) : res.json({
           code: 1,
-          msg: '注册SUCCESS！'
+          msg: 'SUCCESS'
         })
       })
     }
@@ -76,7 +76,7 @@ const changePwdWithUserNumber = (req, res) => {
             msg: "error: "+err
           }) : res.json({
             code: 1,
-            msg: '修改SUCCESS！'
+            msg: 'SUCCESS'
           })
         })
       }

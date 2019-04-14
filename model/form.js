@@ -21,9 +21,14 @@ const Form = mongoose.model('form', {
 function getNewFormId () {
     return new Promise((resolve, reject) => {
         Form.find().then((res) => {
+            let lastForm, id
             // 获取最后一份作业的id 在此基础上+1
-            let lastForm = res[res.length - 1]
-            let id = lastForm.toObject().FormID
+            if(res.length > 0) {
+                lastForm = res[res.length - 1]
+                id = lastForm.toObject().FormID
+            } else {
+                id = 0
+            }
             resolve(id + 1)
         }).catch((err) => {
             reject(err)

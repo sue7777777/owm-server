@@ -71,7 +71,7 @@ const createForm = (req, res) => {
         if (!createRes.FormID) {
             res.json({
                 code: -1,
-                msg: 'FAILED！'
+                msg: 'FAILED'
             })
         } else {
             res.json({
