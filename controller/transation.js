@@ -84,6 +84,8 @@ const updateTransation = (req, res) => {
     }
 
     let {FormID, TransationID, data} = req.body
+    data.Answers && (data.Answers = eval(data.Answers))
+    console.log(typeof data.Answers)
     transationModel.updateTransation({FormID, TransationID, data}, updateRes => {
         if (updateRes.error) {
             res.json({

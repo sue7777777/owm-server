@@ -2,6 +2,7 @@ const mongoose = require('../utils/dbhandler')
 const formModel = require('../model/form')
 
 const Transation = mongoose.model('transation', {
+    Answers: Array,         // 答案数组
     CommentScore: Boolean,  // 是否已批阅
     CreateTime: Number,     // 开始答题的时间（创建时间）
     CreaterID: String,      // 这份回复的创建者
@@ -44,53 +45,73 @@ const getTransationsNumber = (FormID, callback) => {
 }
 
 const createTransation = (transationInfo, callback) => {
-    formModel.findForm({FormID: transationInfo.FormID}, (form) => {
+    formModel.findForm({FormID: transationInfo.FormID}, form => {
         if (form) {
-            Transation.countDocuments({FormID: transationInfo.FormID}, (err, count) => {
-                if (!err) {
-                    let time = new Date().getTime()
-                    let data = {
-                        CommentScore: false,
-                        CreateTime: time,
-                        CreaterID: transationInfo.userName,
-                        DelivererID: form.CreaterID,
-                        FormID: transationInfo.FormID,
-                        ObjectiveAnswer: false,
-                        Status: "unsubmitted",
-                        SubjectiveAnswer: false,
-                        SubmitterID: transationInfo.userName,
-                        TransationID: count+1,
-                        UpdateTime: time,
-                        UpdaterID: transationInfo.userName,
-                    }
-                    new Transation(data).save().then(res => callback({
+            // 创建之前根据用户名查询是否有已经提交的回复
+            Transation.findOne({FormID: transationInfo.FormID, SubmitterID: transationInfo.userName}, {_id: 0}).then(transation => {
+                let res = transation.toObject()
+                delete res.__v
+                if (res.TransationID) {
+                    callback({
                         Form: form,
-                        Transation: data
-                    })).catch(err => callback(err))
-                } else callback(err)
-            })
+                        Transation: res
+                    })
+                } else {
+                    Transation.countDocuments({FormID: transationInfo.FormID}, (err, count) => {
+                        if (!err) {
+                            let time = new Date().getTime()
+                            let data = {
+                                CommentScore: false,
+                                CreateTime: time,
+                                CreaterID: transationInfo.userName,
+                                DelivererID: form.CreaterID,
+                                FormID: transationInfo.FormID,
+                                ObjectiveAnswer: false,
+                                Status: "unsubmitted",
+                                SubjectiveAnswer: false,
+                                SubmitterID: transationInfo.userName,
+                                TransationID: count+1,
+                                UpdateTime: time,
+                                UpdaterID: transationInfo.userName,
+                            }
+                            new Transation(data).save().then(res => callback({
+                                Form: form,
+                                Transation: data
+                            })).catch(err => callback(err))
+                        } else callback(err)
+                    })
+                }
+            }).catch(err => callback({error: err}))
+            
         } else callback({error})
     })
 }
 
 const updateTransation = (update, callback) => {
     let {FormID, TransationID, data} = update
-    formModel.findForm({FormID}).then(form => {
-        let expire = form.toObject().ExpireTimestamp
-        if (Date.now().getTime() > expire) {
+    formModel.findForm({FormID}, form => {
+        // console.log(form)
+        let expire = form.ExpireTimestamp
+        if (new Date().getTime() > expire) {
             // 过期的提示已过期
             callback({error: err, msg: 'submit time expired'})
         } else {
+            console.log(data)
             Transation.updateOne({FormID, TransationID}, {...data})
             .then(res => callback(res))
             .catch(err => callback({error: err}))
         }
-    }).catch(err => callback({error: err}))
+    })
+}
+
+const findTransationByName = (data, callback) => {
+    
 }
 
 module.exports = {
     getTransations,
     getTransationsNumber,
     createTransation,
-    updateTransation
+    updateTransation,
+    findTransationByName
 }

@@ -8,7 +8,7 @@ const Form = mongoose.model('form', {
     ExtraSubmitterInfos: Array,// 额外的提交者信息-保留字段
     FormID: Number,             // 作业id
     IsReplied: Boolean,         // 是否有人回复
-    Name: String,               // 作业标题
+    Name: Object,               // 作业标题
     OwnerID: String,            // 用户id
     PublishTimestamp: Number,   // 发布时间戳 ms
     Questions: Array,           // 问题数组
@@ -66,6 +66,12 @@ const findForm = (FromID, callback) => {
     Form.findOne(FromID, {_id: 0}).then((res) => {
         let form = res.toObject()
         delete form.__v
+        form.Questions = form.Questions.map(item => {
+            if (!item.Name.image) {
+                item.Name.image = {}
+            }
+            return item
+        })
         callback(form)
     }).catch((err) => {
         callback({error: err})

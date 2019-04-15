@@ -3,18 +3,18 @@ const FileModel = require('../model/file')
 const uploadFile = (req,res) => {
     let {name, data, type, userName} = req.body
     FileModel.uploadFile({name, data, type, userName}, uploadRes => {
-        if (uploadRes.id) {
+        if (uploadRes.error) {
+            res.json({
+                code: -1,
+                msg: 'FAILED'
+            })
+        } else {
             res.json({
                 code: 1,
                 msg: 'SUCCESS',
                 data: {
-                    id: id
+                    id: uploadRes.id
                 }
-            })
-        } else {
-            res.json({
-                code: -1,
-                msg: 'FAILED'
             })
         }
     })
@@ -22,7 +22,7 @@ const uploadFile = (req,res) => {
 
 const getFile = (req, res) => {
     let {id} = req.query
-    FileModel.getFile(id, file => {
+    FileModel.getFile({id}, file => {
         if (file.error) {
             res.json({
                 code: -1,

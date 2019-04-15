@@ -2,13 +2,13 @@ const formModel = require('../model/form')
 const tools = require('../utils/tools')
 
 const getForm = (req, res) => {
-    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
-    if (!userName) {
-        res.json({
-            code: -1,
-            msg: 'NO_LOGIN'
-        })
-    } 
+    // let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    // if (!userName) {
+    //     res.json({
+    //         code: -1,
+    //         msg: 'NO_LOGIN'
+    //     })
+    // } 
 
     let {FormID} = req.query
     formModel.findForm({FormID}, (form) => {

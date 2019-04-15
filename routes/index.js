@@ -31,6 +31,6 @@ router.post('/transation/updateTransation', transationController.updateTransatio
 
 // file
 router.get('/file/getFile', fileController.getFile)
-router.post('/file/postFile', fileController.uploadFile)
+router.post('/file/uploadFile', fileController.uploadFile)
 
 module.exports = router;

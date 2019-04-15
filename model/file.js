@@ -15,9 +15,8 @@ const uploadFile = (data, callback) => {
         data: data.data,
         id: tools.toMD5(`${data.userName}+${new Date().getTime()}`)
     })
-    newFile.save().then(res => {
-        callback({id: newFile.id})
-    }).catch(err => callback({error: err}))
+    newFile.save().then(res => callback(newFile))
+    .catch(err => callback({error: err}))
 }
 
 const getFile = (id, callback) => {
