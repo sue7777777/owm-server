@@ -49,14 +49,8 @@ const createTransation = (transationInfo, callback) => {
         if (form) {
             // 创建之前根据用户名查询是否有已经提交的回复
             Transation.findOne({FormID: transationInfo.FormID, SubmitterID: transationInfo.userName}, {_id: 0}).then(transation => {
-                let res = transation.toObject()
-                delete res.__v
-                if (res.TransationID) {
-                    callback({
-                        Form: form,
-                        Transation: res
-                    })
-                } else {
+                if (transation === null) {
+                    // 用户未创建回复
                     Transation.countDocuments({FormID: transationInfo.FormID}, (err, count) => {
                         if (!err) {
                             let time = new Date().getTime()
@@ -80,9 +74,15 @@ const createTransation = (transationInfo, callback) => {
                             })).catch(err => callback(err))
                         } else callback(err)
                     })
+                } else {
+                    let res = transation.toObject()
+                    delete res.__v
+                    callback({
+                        Form: form,
+                        Transation: res
+                    })
                 }
             }).catch(err => callback({error: err}))
-            
         } else callback({error})
     })
 }
