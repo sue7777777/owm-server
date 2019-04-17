@@ -1,6 +1,25 @@
 const transationModel = require('../model/transation')
 const tools = require('../utils/tools')
 
+const getTransation  = (req, res) => {
+    let {TransationID} = req.query
+
+    transationModel.getTransation(TransationID, result => {
+        if (result.error) {
+            res.json({
+                code: -1,
+                msg: result.error || 'FAILED',
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: 'SUCCESS',
+                data: result
+            })
+        }
+    })
+}
+
 const getTransations = (req, res) => {
     let {formId,status, limit, skip} = req.query
     
@@ -10,7 +29,7 @@ const getTransations = (req, res) => {
         if (!list) {
             res.json({
                 code: -1,
-                msg: '参数错误'
+                msg: 'FAILED'
             })
         } else {
             let pageList = list
@@ -36,7 +55,7 @@ const getTransationNumber = (req, res) => {
         if (!TransationNum) {
             res.json({
                 code: -1,
-                msg: '参数错误'
+                msg: 'FAILED'
             })
         } else {
             res.json({
@@ -85,7 +104,7 @@ const updateTransation = (req, res) => {
 
     let {FormID, TransationID, data} = req.body
     data.Answers && (data.Answers = eval(data.Answers))
-    console.log(typeof data.Answers)
+    data.AnswerComments && (data.AnswerComments = eval(data.AnswerComments))
     transationModel.updateTransation({FormID, TransationID, data}, updateRes => {
         if (updateRes.error) {
             res.json({
@@ -104,6 +123,7 @@ const updateTransation = (req, res) => {
 }
 
 module.exports = {
+    getTransation,
     getTransations,
     getTransationNumber,
     createTransation,

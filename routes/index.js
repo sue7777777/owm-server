@@ -24,6 +24,7 @@ router.post('/form/publishForm', formController.publishForm)
 router.post('/form/updateQuestions', formController.updateQuestions)
 
 // transation
+router.get('/transation/getTransation', transationController.getTransation)
 router.get('/transation/getTransations', transationController.getTransations)
 router.get('/transation/getTransationNumber', transationController.getTransationNumber)
 router.get('/transation/createTransation', transationController.createTransation)

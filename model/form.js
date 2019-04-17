@@ -62,17 +62,22 @@ const findFormByName = (query, callback) => {
 }
 
 // 查找对应id作业
-const findForm = (FromID, callback) => {
-    Form.findOne(FromID, {_id: 0}).then((res) => {
-        let form = res.toObject()
-        delete form.__v
-        form.Questions = form.Questions.map(item => {
-            if (!item.Name.image) {
-                item.Name.image = {}
-            }
-            return item
-        })
-        callback(form)
+const findForm = (FormID, callback) => {
+    Form.findOne(FormID, {_id: 0}).then((res) => {
+        console.log(FormID)
+        if (res === null) {
+            callback({error: '找不到作业'})
+        } else {
+            let form = res.toObject()
+            delete form.__v
+            form.Questions = form.Questions.map(item => {
+                if (!item.Name.image) {
+                    item.Name.image = {}
+                }
+                return item
+            })
+            callback(form)
+        }
     }).catch((err) => {
         callback({error: err})
     })
@@ -148,8 +153,11 @@ const copyForm = (FormID, callback) => {
 
 // 发布作业
 const publishForm = (updateInfo, callback) => {
+    let time = new Date().getTime()
     let update = {
         ExpireTimestamp : updateInfo.ExpireTimestamp,
+        PublishTimestamp: time,
+        UpdateTime: time,
         Status: 'published',
         UpdaterID: updateInfo.userName
     }

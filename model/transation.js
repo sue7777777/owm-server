@@ -3,10 +3,11 @@ const formModel = require('../model/form')
 
 const Transation = mongoose.model('transation', {
     Answers: Array,         // 答案数组
-    CommentScore: Boolean,  // 是否已批阅
+    AnswerComments: Array,  // 批阅内容和得分
     CreateTime: Number,     // 开始答题的时间（创建时间）
     CreaterID: String,      // 这份回复的创建者
     DelivererID: String,    // 发布作业者id（同作业创建者id）-保留字段
+    Score: Number,          // 作业得分（submitted只算客观题，reviewed算总分）
     FormID: Number,         // 作业id
     ObjectiveAnswer: Boolean,// 客观题
     ReplyTimestamp: Number, // 结束答题并提交的时间（回复时间）
@@ -18,6 +19,29 @@ const Transation = mongoose.model('transation', {
     UpdateTime: Number,     // 更新时间(作业批阅时用)
     UpdaterID: String,      // 更新者id
 })
+
+// 根据transationid获取回复
+const getTransation = (id, callback) => {
+    Transation.findOne({TransationID: id}, {_id: 0}).then(transation => {
+        if (transation === null) {
+            callback({error: '找不到回复'})
+        } else {
+            let res = transation.toObject()
+            delete res.__v
+            formModel.findForm({FormID: res.FormID}, form => {
+                console.log(form)
+                if (form.error) {
+                    callback({error: form.error})
+                } else {
+                    callback({
+                        Form: form,
+                        Transation: res
+                    })
+                }
+            })
+        }
+    }).catch(err => callback({error: err}))
+}
 
 // 根据formid获取作业的回复列表
 const getTransations = (queryArr, callback) => {
@@ -64,9 +88,10 @@ const createTransation = (transationInfo, callback) => {
                                 Status: "unsubmitted",
                                 SubjectiveAnswer: false,
                                 SubmitterID: transationInfo.userName,
+                                Score: 0,
                                 TransationID: count+1,
                                 UpdateTime: time,
-                                UpdaterID: transationInfo.userName,
+                                UpdaterID: transationInfo.userName
                             }
                             new Transation(data).save().then(res => callback({
                                 Form: form,
@@ -91,27 +116,23 @@ const updateTransation = (update, callback) => {
     let {FormID, TransationID, data} = update
     formModel.findForm({FormID}, form => {
         // console.log(form)
+        let time = new Date().getTime()
         let expire = form.ExpireTimestamp
-        if (new Date().getTime() > expire) {
+        if (time > expire) {
             // 过期的提示已过期
             callback({error: err, msg: 'submit time expired'})
         } else {
-            console.log(data)
-            Transation.updateOne({FormID, TransationID}, {...data})
+            Transation.updateOne({FormID, TransationID}, {...data, UpdateTime: time})
             .then(res => callback(res))
             .catch(err => callback({error: err}))
         }
     })
 }
 
-const findTransationByName = (data, callback) => {
-    
-}
-
 module.exports = {
+    getTransation,
     getTransations,
     getTransationsNumber,
     createTransation,
-    updateTransation,
-    findTransationByName
+    updateTransation
 }
