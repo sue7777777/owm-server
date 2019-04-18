@@ -64,7 +64,6 @@ const findFormByName = (query, callback) => {
 // 查找对应id作业
 const findForm = (FormID, callback) => {
     Form.findOne(FormID, {_id: 0}).then((res) => {
-        console.log(FormID)
         if (res === null) {
             callback({error: '找不到作业'})
         } else {

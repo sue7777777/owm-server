@@ -20,6 +20,35 @@ const Transation = mongoose.model('transation', {
     UpdaterID: String,      // 更新者id
 })
 
+function getScore(FormID, Answers) {
+    return new Promise((resolve, reject) => {
+        formModel.findForm(FormID, form => {
+            if (form.error) {
+                resolve({error: form.error})
+            } else {
+                // 从Form查到作业，拿到正确答案
+                let questionObj = form.Questions.map(q => {
+                    return {
+                        score: q.Score,
+                        answer: q.StandardAnswer.Contents
+                    }
+                })
+                let answerObj = Answers.map(ans => ans.Contents)
+                let score = 0
+                for(let i=0 ; i<questionObj.length; i++) {
+                    // 主观题的标准答案为空
+                    if(questionObj[i].answer.length > 0 && questionObj[i].answer.sort().toString() === answerObj[i].sort().toString()) {
+                        score += questionObj[i].score
+                    }
+                }
+                resolve(score)
+            }
+        })
+    })
+    
+    
+}
+
 // 根据transationid获取回复
 const getTransation = (id, callback) => {
     Transation.findOne({TransationID: id}, {_id: 0}).then(transation => {
@@ -29,7 +58,6 @@ const getTransation = (id, callback) => {
             let res = transation.toObject()
             delete res.__v
             formModel.findForm({FormID: res.FormID}, form => {
-                console.log(form)
                 if (form.error) {
                     callback({error: form.error})
                 } else {
@@ -68,6 +96,7 @@ const getTransationsNumber = (FormID, callback) => {
     }).catch(err => callback(err))
 }
 
+// 创建回复（回复时）
 const createTransation = (transationInfo, callback) => {
     formModel.findForm({FormID: transationInfo.FormID}, form => {
         if (form) {
@@ -75,7 +104,7 @@ const createTransation = (transationInfo, callback) => {
             Transation.findOne({FormID: transationInfo.FormID, SubmitterID: transationInfo.userName}, {_id: 0}).then(transation => {
                 if (transation === null) {
                     // 用户未创建回复
-                    Transation.countDocuments({FormID: transationInfo.FormID}, (err, count) => {
+                    Transation.countDocuments({}, (err, count) => {
                         if (!err) {
                             let time = new Date().getTime()
                             let data = {
@@ -112,19 +141,30 @@ const createTransation = (transationInfo, callback) => {
     })
 }
 
+// 更新回复（提交回复、批阅暂存、批阅提交）
 const updateTransation = (update, callback) => {
     let {FormID, TransationID, data} = update
     formModel.findForm({FormID}, form => {
-        // console.log(form)
         let time = new Date().getTime()
         let expire = form.ExpireTimestamp
         if (time > expire) {
             // 过期的提示已过期
             callback({error: err, msg: 'submit time expired'})
         } else {
-            Transation.updateOne({FormID, TransationID}, {...data, UpdateTime: time})
-            .then(res => callback(res))
-            .catch(err => callback({error: err}))
+            if (data.Answers && !data.Score) {
+                // 提交之后计算分数
+                getScore({FormID}, data.Answers).then(score => {
+                    Transation.updateOne({FormID, TransationID}, {...data, UpdateTime: time, Score: score})
+                    .then(res => callback(res))
+                    .catch(err => callback({error: err}))
+                }).catch(err => callback({error: err}))
+            } else {
+                // 批阅的话直接得分
+                Transation.updateOne({FormID, TransationID}, {...data, UpdateTime: time})
+                .then(res => callback(res))
+                .catch(err => callback({error: err}))
+            }
+            
         }
     })
 }
