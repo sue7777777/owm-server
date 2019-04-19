@@ -122,9 +122,37 @@ const updateTransation = (req, res) => {
     })
 }
 
+const getStatistic = (req, res) => {
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: 'NO_LOGIN'
+        })
+    }
+
+    let {FormID} = req.query
+    transationModel.getStatistic({FormID}, stat => {
+        if (stat.error) {
+            res.json({
+                code: -1,
+                msg: 'FAILED',
+                error: stat.error
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: 'SUCCESS',
+                data: stat
+            })
+        }
+    })
+}
+
 module.exports = {
     getTransation,
     getTransations,
+    getStatistic,
     getTransationNumber,
     createTransation,
     updateTransation

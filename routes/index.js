@@ -29,6 +29,7 @@ router.get('/transation/getTransations', transationController.getTransations)
 router.get('/transation/getTransationNumber', transationController.getTransationNumber)
 router.get('/transation/createTransation', transationController.createTransation)
 router.post('/transation/updateTransation', transationController.updateTransation)
+router.get('/transation/getStatistic', transationController.getStatistic)
 
 // file
 router.get('/file/getFile', fileController.getFile)

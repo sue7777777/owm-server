@@ -13,6 +13,7 @@
     "hotnode": "0.0.8",
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
+    "lodash": "^4.17.11",
     "mongodb": "^3.1.13",
     "mongoose": "^5.4.15",
     "morgan": "~1.9.0"

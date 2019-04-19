@@ -1,5 +1,6 @@
 const mongoose = require('../utils/dbhandler')
 const formModel = require('../model/form')
+const _ = require('lodash')
 
 const Transation = mongoose.model('transation', {
     Answers: Array,         // 答案数组
@@ -45,8 +46,58 @@ function getScore(FormID, Answers) {
             }
         })
     })
-    
-    
+}
+
+function getStatisticData(questions, transations) {
+    let questionObj = questions.map(q => {
+        return {
+            score: q.Score,
+            answer: q.StandardAnswer.Contents
+        }
+    })
+    let answerList = transations.map(ans => {
+        return {
+            status: ans.Status,
+            answer: ans.Answers.map(a => a.Contents),// 每份回复的所有问题的答案
+            answerComment: ans.AnswerComments
+        }
+    })
+    console.log(questionObj, answerList)
+    let data = []
+    for (let i=0; i<questionObj.length; i++) {
+        let qaScore = 0, reviewNum = 0, rightNum = 0, optionObj = {}
+        for (let j=0; j<answerList.length; j++) {
+            // 计算正确人数（客观题）
+            if(questionObj[i].answer.length > 0 && questionObj[i].answer.sort().toString() === answerList[j].answer.sort().toString()) {
+                rightNum++
+            }
+            // 已批阅人数
+            if(answerList[j].status === 'reviewed') {
+                reviewNum++
+                // 批阅之后才能得到主观题平均分
+                qaScore += answerList[j].answerComment[i].Score
+            }
+        }
+
+        // 统计各选项人数
+        let questionIndexAnswer = _.flatMapDeep(transations, ans => ans.Answers[i].Contents) // 每份回复中第i道题的答案(答案是一个数组，存放了所有选项的答案)，然后拉伸为一维数组
+        optionObj = questionIndexAnswer.reduce((prev,next) => { 
+            prev[next] = (prev[next] + 1) || 1; 
+            return prev; 
+        },{})
+
+        let qa = {
+            qaScore: qaScore,
+            AnswerNumber: answerList.length,    // 回答人数
+            AverageScore: qaScore/answerList.length,    // 平均分（主观题）
+            OptionNumbers: optionObj,  // 各选项人数
+            QuestionIndex: i,   // 问题序号
+            ReviewNumber: reviewNum,    // 已批阅人数
+            RightNumber: rightNum,     // 正确人数（客观题）
+        }
+        data.push(qa)
+    }
+    return data
 }
 
 // 根据transationid获取回复
@@ -79,7 +130,7 @@ const getTransations = (queryArr, callback) => {
             delete transation.__v
             return transation
         }))
-    }).catch(err => callback(err))
+    }).catch(err => callback({error: err}))
 }
 
 const getTransationsNumber = (FormID, callback) => {
@@ -169,10 +220,27 @@ const updateTransation = (update, callback) => {
     })
 }
 
+const getStatistic = (FormID, callback) => {
+    formModel.findForm(FormID, form => {
+        if (form.error) {
+            callback({error: form.error})
+        } else {
+            getTransations({...FormID, neStatus: 'unsubmitted'}, transationList => {
+                if (transationList.error) {
+                    callback({error: transationList.error})
+                } else {
+                    callback(getStatisticData(form.Questions, transationList))
+                }
+            })
+        }
+    })
+}
+
 module.exports = {
     getTransation,
     getTransations,
     getTransationsNumber,
     createTransation,
-    updateTransation
+    updateTransation,
+    getStatistic
 }

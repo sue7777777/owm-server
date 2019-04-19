@@ -87,7 +87,7 @@ const changePwdWithUserNumber = (req, res) => {
 const getUserInfo = (req, res) => {
   // 根据userName获取全部用户信息
   let { userName } = req.query
-  userModel.findUser({ userName }, (user) => {
+  userModel.findUser({ userName: unescape(userName) }, (user) => {
     if (!res) {
       res.json({
         code: -1,
