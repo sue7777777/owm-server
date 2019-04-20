@@ -149,11 +149,39 @@ const getStatistic = (req, res) => {
     })
 }
 
+const getQuestionIndexResponseList = (req, res) => {
+    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    if (!userName) {
+        res.json({
+            code: -1,
+            msg: 'NO_LOGIN'
+        })
+    }
+
+    let {FormID, QuestionIndex} = req.query
+    transationModel.getQuestionIndexResponseList({FormID, QuestionIndex}, queryRes => {
+        if (queryRes.error) {
+            res.json({
+                code: -1,
+                msg: 'FAILED',
+                error: queryRes
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: 'SUCCESS',
+                data: queryRes
+            })
+        }
+    })
+}
+
 module.exports = {
     getTransation,
     getTransations,
     getStatistic,
     getTransationNumber,
+    getQuestionIndexResponseList,
     createTransation,
     updateTransation
 }

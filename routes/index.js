@@ -30,6 +30,7 @@ router.get('/transation/getTransationNumber', transationController.getTransation
 router.get('/transation/createTransation', transationController.createTransation)
 router.post('/transation/updateTransation', transationController.updateTransation)
 router.get('/transation/getStatistic', transationController.getStatistic)
+router.get('/transation/getQuestionIndexResponseList', transationController.getQuestionIndexResponseList)
 
 // file
 router.get('/file/getFile', fileController.getFile)

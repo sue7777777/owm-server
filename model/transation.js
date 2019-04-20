@@ -62,13 +62,12 @@ function getStatisticData(questions, transations) {
             answerComment: ans.AnswerComments
         }
     })
-    console.log(questionObj, answerList)
     let data = []
     for (let i=0; i<questionObj.length; i++) {
         let qaScore = 0, reviewNum = 0, rightNum = 0, optionObj = {}
         for (let j=0; j<answerList.length; j++) {
             // 计算正确人数（客观题）
-            if(questionObj[i].answer.length > 0 && questionObj[i].answer.sort().toString() === answerList[j].answer.sort().toString()) {
+            if(questionObj[i].answer.length > 0 && questionObj[i].answer.sort().toString() === answerList[j].answer[i].sort().toString()) {
                 rightNum++
             }
             // 已批阅人数
@@ -87,9 +86,9 @@ function getStatisticData(questions, transations) {
         },{})
 
         let qa = {
-            qaScore: qaScore,
+            // qaScore: qaScore,
             AnswerNumber: answerList.length,    // 回答人数
-            AverageScore: qaScore/answerList.length,    // 平均分（主观题）
+            AverageScore: qaScore/reviewNum,    // 平均分（主观题）
             OptionNumbers: optionObj,  // 各选项人数
             QuestionIndex: i,   // 问题序号
             ReviewNumber: reviewNum,    // 已批阅人数
@@ -220,6 +219,7 @@ const updateTransation = (update, callback) => {
     })
 }
 
+// 统计作业数据（正确数、批阅数、每个选项的人数）
 const getStatistic = (FormID, callback) => {
     formModel.findForm(FormID, form => {
         if (form.error) {
@@ -236,11 +236,28 @@ const getStatistic = (FormID, callback) => {
     })
 }
 
+// 查询某道题的回复列表
+const getQuestionIndexResponseList = (query, callback) => {
+    Transation.find({FormID: query.FormID}).then(transations => {
+        callback(transations.map(t => {
+            return {
+                Answer: t.Answers[query.QuestionIndex],
+                AnswerTimestamp: t.ReplyTimestamp,
+                Score: t.AnswerComments[query.QuestionIndex].Score || 0,
+                SubmitterID: t.SubmitterID,
+                Type: t.Type,
+                Status: t.Status
+            }
+        }))
+    }).catch(err => callback({error: err}))
+}
+
 module.exports = {
     getTransation,
     getTransations,
     getTransationsNumber,
     createTransation,
     updateTransation,
-    getStatistic
+    getStatistic,
+    getQuestionIndexResponseList
 }

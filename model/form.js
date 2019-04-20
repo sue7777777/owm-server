@@ -140,7 +140,6 @@ const copyForm = (FormID, callback) => {
         getNewFormId().then((res) => {
             form.FormID = res
             form.Status = 'draft'
-            console.log(form)
             new Form(form).save().then((res) => {
                 if (res) {
                     callback(form)
