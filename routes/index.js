@@ -5,6 +5,7 @@ const userController = require('../controller/user')
 const formController = require('../controller/form')
 const transationController = require('../controller/transation')
 const fileController = require('../controller/file')
+const groupController = require('../controller/group')
 
 // user
 router.post('/user/login', userController.login)
@@ -35,5 +36,12 @@ router.get('/transation/getQuestionIndexResponseList', transationController.getQ
 // file
 router.get('/file/getFile', fileController.getFile)
 router.post('/file/uploadFile', fileController.uploadFile)
+
+// group
+router.post('/group/createGroup', groupController.createGroup)
+router.get('/group/getGroup', groupController.getGroup)
+router.get('/group/getCreateGroups', groupController.getCreateGroups)
+router.get('/group/addMember', groupController.addMember)
+router.get('/group/removeGroup', groupController.removeGroup)
 
 module.exports = router;

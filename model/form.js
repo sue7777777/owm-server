@@ -7,6 +7,7 @@ const Form = mongoose.model('form', {
     ExpireTimestamp: Number,    // 过期时间戳 ms
     ExtraSubmitterInfos: Array,// 额外的提交者信息-保留字段
     FormID: Number,             // 作业id
+    GroupID: Number,            // 发布的班级id
     IsReplied: Boolean,         // 是否有人回复
     Name: Object,               // 作业标题
     OwnerID: String,            // 用户id

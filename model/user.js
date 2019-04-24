@@ -5,7 +5,7 @@ const mongoose = require('../utils/dbhandler')
  * 参数2： 字段的类型对象（配置项）
  */
 const User = mongoose.model('user', {
-  userName: String,   // 用户名
+  userName: String,   // 用户名，唯一标识
   password: String,   // 密码
   identify: Number,   // 身份： 1-老师， 2-学生
   usernumber: String, // 用户唯一标识，老师是职工号，学生是学号

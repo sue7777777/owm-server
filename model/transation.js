@@ -10,6 +10,7 @@ const Transation = mongoose.model('transation', {
     DelivererID: String,    // 发布作业者id（同作业创建者id）-保留字段
     Score: Number,          // 作业得分（submitted只算客观题，reviewed算总分）
     FormID: Number,         // 作业id
+    GroupID: Number,         // 班级id
     ObjectiveAnswer: Boolean,// 客观题
     ReplyTimestamp: Number, // 结束答题并提交的时间（回复时间）
     Status: String,         // 回复状态(unsubmitted-未回复,submitted-已回复,reviewed-已批阅)
