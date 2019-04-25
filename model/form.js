@@ -92,6 +92,7 @@ const createForm = (formInfo, callback) => {
             CreaterID: formInfo.userName,
             ExtraSubmitterInfos: formInfo.ExtraSubmitterInfos,
             FormID: res,
+            GroupID: 0,
             Name: formInfo.Name,
             OwnerID: formInfo.userName,
             Questions: formInfo.Questions,
@@ -141,6 +142,7 @@ const copyForm = (FormID, callback) => {
         getNewFormId().then((res) => {
             form.FormID = res
             form.Status = 'draft'
+            form.GroupID = 0
             new Form(form).save().then((res) => {
                 if (res) {
                     callback(form)
@@ -158,7 +160,8 @@ const publishForm = (updateInfo, callback) => {
         PublishTimestamp: time,
         UpdateTime: time,
         Status: 'published',
-        UpdaterID: updateInfo.userName
+        UpdaterID: updateInfo.userName,
+        GroupID: updateInfo.GroupID
     }
     Form.updateOne({FormID:updateInfo.FormID}, update)
     .then((res) => callback(res))

@@ -1,12 +1,13 @@
 const mongoose = require('../utils/dbhandler')
+const userModel = require('./user')
 
 const Group = mongoose.model('group', {
-    GroupID: Number,        // 班级id,
-    CreatorID: String,        // 创建者id
-    MemberIDs: Array,         // 成员数组
-    CreateTimestamp: Number,    // 创建时间戳
-    UpdateTimestamp: Number,    // 更新时间戳
-    Name: String,           // 班级名字
+    id: Number,        // 班级id,
+    creator: String,        // 创建者id
+    recent_members: Array,         // 成员数组
+    createTimestamp: Number,    // 创建时间戳
+    updateTimestamp: Number,    // 更新时间戳
+    name: String,           // 班级名字
 })
 
 function getNewGrorpId () {
@@ -16,7 +17,7 @@ function getNewGrorpId () {
             // 获取最后一份作业的id 在此基础上+1
             if(res.length > 0) {
                 lastGroup = res[res.length - 1]
-                id = lastGroup.toObject().GroupID
+                id = lastGroup.toObject().id
             } else {
                 id = 0
             }
@@ -30,17 +31,19 @@ function getNewGrorpId () {
 const createGroup = (data, callback) => {
     let time = new Date().getTime()
     getNewGrorpId().then(id => {
-        let group = {
-            GroupID: id,        // 班级id,
-            CreatorID: data.CreatorID,        // 创建者id
-            MemberIDs: [data.CreatorID],         // 成员数组
-            CreateTimestamp: time,    // 创建时间戳
-            UpdateTimestamp: time,    // 更新时间戳
-            Name: data.Name,           // 班级名字
-        }
-        new Group(group).save().then(res => {
-            callback(group)
-        }).catch(err => callback({error: err}))
+        userModel.findUser({userName: data.creator}, user => {
+            let group = {
+                id: id,        // 班级id,
+                creator: data.creator,        // 创建者id
+                recent_members: [user],         // 成员数组
+                createTimestamp: time,    // 创建时间戳
+                updateTimestamp: time,    // 更新时间戳
+                name: data.name,           // 班级名字
+            }
+            new Group(group).save().then(res => {
+                callback(group)
+            }).catch(err => callback({error: err}))
+        })
     })
 }
 
@@ -55,17 +58,19 @@ const getGroup = (id, callback) => {
 
 // 根据userName查询所有创建的班级
 const getCreateGroups = (userName, callback) => {
-    Group.find({CreatorID: userName}).then(list => callback(list))
+    Group.find({creator: userName}).then(list => callback(list))
     .catch(err => callback({error: err}))
 }
 
 const addMember = (data, callback) => {
-    Group.updateOne({GroupID: data.GroupID}, {
-        $push: { MemberIDs: data.MemberID },
-        UpdateTimestamp: new Date().getTime()
-    }).then(res =>{
-        callback(res)
-    }).catch(err => callback({error: err}))
+    userModel.findUser({userName: data.MemberID}, user => {
+        Group.updateOne({id: data.id}, {
+            $push: { recent_members: user },
+            updateTimestamp: new Date().getTime()
+        }).then(res =>{
+            callback(res)
+        }).catch(err => callback({error: err}))
+    })
 }
 
 const removeGroup = (id, callback) => {

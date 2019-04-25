@@ -22,6 +22,7 @@ const Transation = mongoose.model('transation', {
     UpdaterID: String,      // 更新者id
 })
 
+// 根据作业id和回答的内容计算得分
 function getScore(FormID, Answers) {
     return new Promise((resolve, reject) => {
         formModel.findForm(FormID, form => {
@@ -49,6 +50,7 @@ function getScore(FormID, Answers) {
     })
 }
 
+// 计算统计数据
 function getStatisticData(questions, transations) {
     let questionObj = questions.map(q => {
         return {
@@ -168,6 +170,7 @@ const createTransation = (transationInfo, callback) => {
                                 Status: "unsubmitted",
                                 SubjectiveAnswer: false,
                                 SubmitterID: transationInfo.userName,
+                                GroupID: form.GroupID,
                                 Score: 0,
                                 TransationID: count+1,
                                 UpdateTime: time,

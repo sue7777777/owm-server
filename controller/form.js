@@ -206,8 +206,8 @@ const publishForm = (req, res) => {
             msg: 'NO_LOGIN'
         })
     }
-    let {FormID, ExpireTimestamp} = req.body
-    formModel.publishForm({userName, FormID, ExpireTimestamp}, (updateRes) => {
+    let {FormID, ExpireTimestamp, GroupID} = req.body
+    formModel.publishForm({userName, FormID, ExpireTimestamp, GroupID}, (updateRes) => {
         if (!updateRes) {
             res.json({
                 code: -1,
