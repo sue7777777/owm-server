@@ -78,10 +78,15 @@ const removeGroup = (id, callback) => {
     .catch(err => callback({error: err}))
 }
 
+const changeName = (data, callback) => {
+    Group.updateOne({id: data.id}, {name: data.name}).then(res => callback(res)).catch(err => callback({error: err}))
+}
+
 module.exports = {
     createGroup,
     getGroup,
     getCreateGroups,
     addMember,
-    removeGroup
+    removeGroup,
+    changeName
 }

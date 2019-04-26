@@ -43,5 +43,6 @@ router.get('/group/getGroup', groupController.getGroup)
 router.get('/group/getCreateGroups', groupController.getCreateGroups)
 router.get('/group/addMember', groupController.addMember)
 router.get('/group/removeGroup', groupController.removeGroup)
+router.get('/group/changeName', groupController.changeName)
 
 module.exports = router;

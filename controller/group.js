@@ -110,10 +110,30 @@ const removeGroup = (req, res) => {
     })
 }
 
+const changeName = (req, res) => {
+    let {id, name} = req.query
+    groupModel.changeName({id: id, name: name}, updateRes => {
+        if (updateRes.error) {
+            res.json({
+                code: -1,
+                msg: 'FAILED',
+                error: updateRes.error
+            })
+        } else {
+            res.json({
+                code: 1,
+                msg: 'SUCCESS',
+                data: updateRes
+            })
+        }
+    })
+}
+
 module.exports = {
     createGroup,
     getGroup,
     getCreateGroups,
     addMember,
-    removeGroup
+    removeGroup,
+    changeName
 }
