@@ -1,4 +1,5 @@
 const userModel = require('../model/user')
+const tools = require('../utils/tools')
 
 const login  = (req, res) => {
   let {userName, password} = req.body
@@ -10,16 +11,10 @@ const login  = (req, res) => {
       })
     } else {
       if (user.password == password) {
-        res.cookie('user', userName)
         res.json({
           code: 1,
           msg: 'SUCCESS',
-          result: {
-            userName: user.userName,
-            identify: user.identify,
-            usernumber: user.usernumber,
-            avatar: user.avatar
-          }
+          result: user
         })
       } else {
         res.json({
@@ -85,10 +80,10 @@ const changePwdWithUserNumber = (req, res) => {
 }
 
 const getUserInfo = (req, res) => {
-  // 根据userName获取全部用户信息
-  let { userName } = req.query
+  let {userName} = req.query
+
   userModel.findUser({ userName: unescape(userName) }, (user) => {
-    if (!res) {
+    if (user.error) {
       res.json({
         code: -1,
         msg: '用户不存在'
@@ -97,12 +92,88 @@ const getUserInfo = (req, res) => {
       res.json({
         code: 1,
         msg: 'SUCCESS',
-        result: {
-          userName: user.userName,
-          identify: user.identify,
-          usernumber: user.usernumber,
-          avatar: user.avatar
-        }
+        result: user
+      })
+    }
+  })
+}
+
+const addTeachers = (req, res) => {
+  let {teachers} = req.body
+  teachers = eval(teachers)
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+      res.json({
+          code: -1,
+          msg: 'NO_LOGIN'
+      })
+  }
+
+  userModel.addTeachers({teachers: teachers, userName: userName}, addRes => {
+    if (addRes.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: addRes.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: addRes
+      })
+    }
+  })
+}
+
+const getTeachers = (req, res) => {
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+      res.json({
+          code: -1,
+          msg: 'NO_LOGIN'
+      })
+  }
+
+  userModel.getTeachers({}, teachers => {
+    if (teachers.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: teachers.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: "SUCCESS",
+        list: teachers
+      })
+    }
+  })
+}
+
+const removeTeachers = (req, res) => {
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+      res.json({
+          code: -1,
+          msg: 'NO_LOGIN'
+      })
+  }
+  let {teachers} = req.body
+  teachers = eval(teachers)
+  userModel.removeTeachers({userName: userName, teachers: teachers}, updateRes => {
+    if (updateRes.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: updateRes.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: updateRes
       })
     }
   })
@@ -112,5 +183,8 @@ module.exports = {
   login,
   register,
   changePwdWithUserNumber,
-  getUserInfo
+  getUserInfo,
+  addTeachers,
+  getTeachers,
+  removeTeachers
 }

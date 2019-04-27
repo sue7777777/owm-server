@@ -12,6 +12,9 @@ router.post('/user/login', userController.login)
 router.post('/user/register', userController.register)
 router.post('/user/forgetPassword', userController.changePwdWithUserNumber)
 router.get('/user/getUserInfo', userController.getUserInfo)
+router.get('/user/getTeachers', userController.getTeachers)
+router.post('/user/addTeachers', userController.addTeachers)
+router.post('/user/removeTeachers', userController.removeTeachers)
 
 // form
 router.get('/form/getForm', formController.getForm)
