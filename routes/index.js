@@ -26,6 +26,7 @@ router.post('/form/copyForm', formController.copyForm)
 router.post('/form/saveForm', formController.saveForm)
 router.post('/form/publishForm', formController.publishForm)
 router.post('/form/updateQuestions', formController.updateQuestions)
+router.get('/form/getUserFormList', formController.getUserFormList)
 
 // transation
 router.get('/transation/getTransation', transationController.getTransation)
@@ -35,6 +36,7 @@ router.get('/transation/createTransation', transationController.createTransation
 router.post('/transation/updateTransation', transationController.updateTransation)
 router.get('/transation/getStatistic', transationController.getStatistic)
 router.get('/transation/getQuestionIndexResponseList', transationController.getQuestionIndexResponseList)
+router.get('/transation/getMyTransations', transationController.getMyTransations)
 
 // file
 router.get('/file/getFile', fileController.getFile)
