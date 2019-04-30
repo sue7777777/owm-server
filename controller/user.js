@@ -3,8 +3,8 @@ const tools = require('../utils/tools')
 
 const login  = (req, res) => {
   let {userName, password} = req.body
-  userModel.findUser({userName}, (user) => {
-    if (!user) {
+  userModel.findUserWithPas({userName}, (user) => {
+    if (user.error) {
       res.json({
         code: -1,
         msg: '用户名不存在'
@@ -90,39 +90,10 @@ const getUserInfo = (req, res) => {
         msg: '用户不存在'
       })
     } else {
-      delete user.password
       res.json({
         code: 1,
         msg: 'SUCCESS',
         result: user
-      })
-    }
-  })
-}
-
-const addTeachers = (req, res) => {
-  let {teachers} = req.body
-  teachers = eval(teachers)
-  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
-  if (!userName) {
-      res.json({
-          code: -1,
-          msg: 'NO_LOGIN'
-      })
-  }
-
-  userModel.addTeachers({teachers: teachers, userName: userName}, addRes => {
-    if (addRes.error) {
-      res.json({
-        code: -1,
-        msg: 'FAILED',
-        error: addRes.error
-      })
-    } else {
-      res.json({
-        code: 1,
-        msg: 'SUCCESS',
-        data: addRes
       })
     }
   })
@@ -154,7 +125,8 @@ const getTeachers = (req, res) => {
   })
 }
 
-const removeTeachers = (req, res) => {
+const addGroup = (req, res) => {
+  let {GroupID} = req.query
   let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
   if (!userName) {
       res.json({
@@ -162,9 +134,35 @@ const removeTeachers = (req, res) => {
           msg: 'NO_LOGIN'
       })
   }
-  let {teachers} = req.body
-  teachers = eval(teachers)
-  userModel.removeTeachers({userName: userName, teachers: teachers}, updateRes => {
+
+  userModel.addGroup({GroupID: GroupID, userName: unescape(userName)}, addRes => {
+    console.log(addRes)
+    if (addRes.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: addRes.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: addRes
+      })
+    }
+  })
+}
+
+const quitGroup = (req, res) => {
+  let {GroupID} = req.query
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+      res.json({
+          code: -1,
+          msg: 'NO_LOGIN'
+      })
+  }
+  userModel.quitGroup({userName: userName, GroupID: GroupID}, updateRes => {
     if (updateRes.error) {
       res.json({
         code: -1,
@@ -181,12 +179,38 @@ const removeTeachers = (req, res) => {
   })
 }
 
+const getMyGroups = (req, res) => {
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+      res.json({
+          code: -1,
+          msg: 'NO_LOGIN'
+      })
+  }
+  userModel.getMyGroups({userName: userName}, list => {
+    if (list.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: list.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: list
+      })
+    }
+  })
+}
+
 module.exports = {
   login,
   register,
   changePwdWithUserNumber,
   getUserInfo,
-  addTeachers,
   getTeachers,
-  removeTeachers
+  addGroup,
+  quitGroup,
+  getMyGroups
 }

@@ -185,10 +185,16 @@ const updateQuestion = (update, callback) => {
     }).catch(err => callback({error: err}))
 }
 
+// 查找发布给对应group的作业
+const getGroupFormList = (query, callback) => {
+  Form.find({GroupID: query.GroupID, Status: 'published'}, {_id: 0}).then(res => callback(res)).catch(err => callback({error: err}))
+}
+
 module.exports = {
     findForm,
     findFormByName,
     getFormList,
+    getGroupFormList,
     createForm,
     deleteForm,
     saveForm,

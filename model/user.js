@@ -1,4 +1,5 @@
 const mongoose = require('../utils/dbhandler')
+const groupModel = require('../model/group')
 
 /**
  * 参数1： 需要链接的表名（mongoose会自动将这个表加一个s）
@@ -10,8 +11,16 @@ const User = mongoose.model('user', {
   identify: Number,   // 身份： 1-老师， 2-学生
   usernumber: String, // 用户唯一标识，老师是职工号，学生是学号
   avatar: String,     // 头像图片
-  teachers: Array,      // 学生的任课老师
+  groups: Array,      // 学生的任课老师
 })
+
+const findUserWithPas = (userInfo, callback) => {
+  User.findOne(userInfo, {_id: 0}).then(res => {
+    let res2 = res.toObject()
+    delete res2.__v
+    callback(res2)
+  }).catch(err => callback({error: err}))
+}
 
 // 查找
 const findUser = (userInfo, callback) => {
@@ -53,24 +62,54 @@ const changeUserPwd = (userInfo, callback) => {
   })
 }
 
-// 为学生添加任课老师
-const addTeachers = (data, callback) => {
-  User.updateOne({userName: unescape(data.userName), identify: 2}, {$addToSet: {teachers: data.teachers } }).then(res => callback(res)).catch(err => callback({error: err}))
-}
-
 const getTeachers = (data, callback) => {
   User.find({identify: 1}, {_id:0}).then(res => callback(res)).catch(err => callback({error: err}))
 }
 
-const removeTeachers = (data, callback) => {
-  User.updateOne({userName: unescape(data.userName), identify: 2}, {$pullAll: {teachers: data.teachers}}).then(res => callback(res)).catch(err => callback({error: err}))
+// 获取用户加入的班级（不包括创建的）
+const getMyGroups = (data, callback) => {
+  User.findOne({userName: unescape(data.userName)}).then(res => {
+    callback(res.groups)
+  }).catch(err => callback({error: err}))
+}
+
+// 用户加入班级
+const addGroup = (data, callback) => {
+  User.updateOne({userName: unescape(data.userName), identify: 2}, {$addToSet: {groups: data.GroupID} }).then(res => {
+    User.find({userName: unescape(data.userName)}).then(user => {
+      // 为group添加成员
+      groupModel.addMember({Member: user, id:  data.GroupID}, updateRes => {
+        if (updateRes.error) {
+          callback({error: updateRes.error})
+        } else {
+          callback(res)
+        }
+      })
+    }).catch(err => callback({error: err}))
+  }).catch(err => callback({error: err}))
+}
+
+// 用户退出班级
+const quitGroup = (data, callback) => {
+  User.updateOne({userName: unescape(data.userName), identify: 2}, {$pull: {groups: data.GroupID}}).then(res => {
+    // 将用户移出group
+    groupModel.removeMember({id: data.GroupID, MemberID: data.userName}, updateRes => {
+      if (updateRes.error) {
+        callback({error: updateRes.error})
+      } else {
+        callback(res)
+      }
+    })
+  }).catch(err => callback({error: err}))
 }
 
 module.exports = {
   findUser,
+  findUserWithPas,
   insertUser,
   changeUserPwd,
-  addTeachers,
   getTeachers,
-  removeTeachers
+  getMyGroups,
+  addGroup,
+  quitGroup
 }

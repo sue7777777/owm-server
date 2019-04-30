@@ -295,11 +295,31 @@ const getSearchList = (req,res) => {
   })
 }
 
+const getGroupFormList = (req, res) => {
+  let {GroupID} = req.query
+  formModel.getGroupFormList({GroupID: GroupID}, list => {
+    if (list.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: list.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: list
+      })
+    }
+  })
+}
+
 module.exports = {
   getForm,
   getFormByID,
   getFormList,
   getUserFormList,
+  getGroupFormList,
   getSearchList,
   createForm,
   deleteForm,

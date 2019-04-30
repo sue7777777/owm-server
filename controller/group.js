@@ -1,31 +1,43 @@
 const groupModel = require('../model/group')
+const userModel = require('../model/user')
 const tools = require('../utils/tools')
 
 const createGroup = (req, res) => {
-    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
-    if (!userName) {
-        res.json({
-            code: -1,
-            msg: 'NO_LOGIN'
-        })
-    }
-
-    let {name} = req.body
-    groupModel.createGroup({creator: userName, name}, createRes => {
-        if (createRes.error) {
-            res.json({
-                code: -1,
-                msg: 'FAILED',
-                error: createRes.error
-            })
-        } else {
-            res.json({
-                code: 1,
-                msg: 'SUCCESS',
-                data: createRes
-            })
-        }
+  let userName = tools.Cookie.get(req.headers.cookie,'owm_id')
+  if (!userName) {
+    res.json({
+      code: -1,
+      msg: 'NO_LOGIN'
     })
+  }
+
+  let {name} = req.body
+  userModel.findUser({userName: userName}, user => {
+    if (user.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: user.error
+      })
+    } else {
+      groupModel.createGroup({creator: user, creatorID: userName, name}, createRes=> {
+        if (createRes.error) {
+          res.json({
+              code: -1,
+              msg: 'FAILED',
+              error: createRes.error
+          })
+        } else {
+          res.json({
+              code: 1,
+              msg: 'SUCCESS',
+              data: createRes
+          })
+        }
+      })
+    }
+  })
+  
 }
 
 const getGroup = (req, res) => {
@@ -48,12 +60,15 @@ const getGroup = (req, res) => {
 }
 
 const getCreateGroups = (req, res) => {
-    let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+    let {userName} = req.query
     if (!userName) {
-        res.json({
-            code: -1,
-            msg: 'NO_LOGIN'
-        })
+      userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+      if (!userName) {
+          res.json({
+              code: -1,
+              msg: 'NO_LOGIN'
+          })
+      }
     }
     groupModel.getCreateGroups(userName, list => {
         if (list.error) {
@@ -72,24 +87,24 @@ const getCreateGroups = (req, res) => {
     })
 }
 
-const addMember = (req, res) => {
-    let {id, MemberID} = req.query
-    groupModel.addMember({id, MemberID}, updateRes => {
-        if (updateRes.error) {
-            res.json({
-                code: -1,
-                msg: 'FAILED',
-                error: updateRes.error
-            })
-        } else {
-            res.json({
-                code: 1,
-                msg: 'SUCESS',
-                data: updateRes
-            })
-        }
-    })
-}
+// const addMember = (req, res) => {
+//     let {id, MemberID} = req.query
+//     groupModel.addMember({id, MemberID}, updateRes => {
+//         if (updateRes.error) {
+//             res.json({
+//                 code: -1,
+//                 msg: 'FAILED',
+//                 error: updateRes.error
+//             })
+//         } else {
+//             res.json({
+//                 code: 1,
+//                 msg: 'SUCESS',
+//                 data: updateRes
+//             })
+//         }
+//     })
+// }
 
 const removeGroup = (req, res) => {
     let {id} = req.query
@@ -133,7 +148,7 @@ module.exports = {
     createGroup,
     getGroup,
     getCreateGroups,
-    addMember,
+    // addMember,
     removeGroup,
     changeName
 }
