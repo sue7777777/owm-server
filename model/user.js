@@ -18,7 +18,7 @@ const findUser = (userInfo, callback) => {
   User.findOne(userInfo, {_id: 0}).then(res => {
     let res2 = res.toObject()
     delete res2.__v
-    delete res2.password
+    // delete res2.password
     callback(res2)
   }).catch(err => callback({error: err}))
 }

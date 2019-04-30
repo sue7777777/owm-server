@@ -11,6 +11,7 @@ const login  = (req, res) => {
       })
     } else {
       if (user.password == password) {
+        delete user.password
         res.json({
           code: 1,
           msg: 'SUCCESS',
@@ -89,6 +90,7 @@ const getUserInfo = (req, res) => {
         msg: '用户不存在'
       })
     } else {
+      delete user.password
       res.json({
         code: 1,
         msg: 'SUCCESS',

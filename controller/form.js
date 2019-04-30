@@ -27,6 +27,25 @@ const getForm = (req, res) => {
   })
 }
 
+const getFormByID = (req, res) => {
+  let {FormID} = req.query
+  formModel.findForm({FormID: FormID}, form => {
+    if (form.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: form.error
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: form
+      })
+    }
+  })
+}
+
 const getUserFormList = (req, res) => {
   let {userName} = req.query
 
@@ -278,6 +297,7 @@ const getSearchList = (req,res) => {
 
 module.exports = {
   getForm,
+  getFormByID,
   getFormList,
   getUserFormList,
   getSearchList,

@@ -254,7 +254,13 @@ const getQuestionIndexResponseList = (query, callback) => {
 }
 
 const getMyTransations = (query, callback) => {
-  Transation.find({SubmitterID: query.userName}).then(res => callback(res)).catch(err => callback({error: err}))
+  Transation.find({SubmitterID: query.userName}).then(res => callback(res.map(item => {
+    return {
+      TransationID: item.TransationID,
+      FormID: item.FormID,
+      TransationStatus: item.Status
+    }
+  }))).catch(err => callback({error: err}))
 }
 
 module.exports = {
