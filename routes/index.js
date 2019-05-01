@@ -6,6 +6,7 @@ const formController = require('../controller/form')
 const transationController = require('../controller/transation')
 const fileController = require('../controller/file')
 const groupController = require('../controller/group')
+const specialController = require('../controller/special')
 
 // user
 router.post('/user/login', userController.login)
@@ -49,8 +50,11 @@ router.post('/file/uploadFile', fileController.uploadFile)
 router.post('/group/createGroup', groupController.createGroup)
 router.get('/group/getGroup', groupController.getGroup)
 router.get('/group/getCreateGroups', groupController.getCreateGroups)
-// router.get('/group/addMember', groupController.addMember)
 router.get('/group/removeGroup', groupController.removeGroup)
 router.get('/group/changeName', groupController.changeName)
+
+// special
+router.get('/special/getSpecials', specialController.getSpecials)
+router.post('/special/addSpecial', specialController.addSpecial)
 
 module.exports = router;

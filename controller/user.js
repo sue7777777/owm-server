@@ -32,10 +32,17 @@ const register = (req, res) => {
   // 检查是否用户名已存在
   userModel.findUser({userName}, (user) => {
     if (user) {
-      res.json({
-        code: -1,
-        msg: '用户名已存在'
-      })
+      if (user.error) {
+        res.json({
+          code: -1,
+          msg: '注册失败'
+        })
+      } else {
+        res.json({
+          code: -1,
+          msg: '用户名已存在'
+        })
+      }
     } else {
       userModel.insertUser({userName, password, identify, usernumber, avatar} ,(result) => {
         !result? res.json({

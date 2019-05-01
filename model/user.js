@@ -25,10 +25,14 @@ const findUserWithPas = (userInfo, callback) => {
 // 查找
 const findUser = (userInfo, callback) => {
   User.findOne(userInfo, {_id: 0}).then(res => {
-    let res2 = res.toObject()
-    delete res2.__v
-    // delete res2.password
-    callback(res2)
+    if (res) {
+      let res2 = res.toObject()
+      delete res2.__v
+      delete res2.password
+      callback(res2)
+    } else {
+      callback(null)
+    }
   }).catch(err => callback({error: err}))
 }
 
@@ -40,7 +44,7 @@ const insertUser = (userInfo, callback) => {
     identify: userInfo.identify,
     usernumber: userInfo.usernumber,
     avatar: userInfo.avatar,
-    teachers: userInfo.teachers
+    groups: []
   })
   user.save().then((err, res) => {
     if (err) {
