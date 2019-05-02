@@ -48,9 +48,13 @@ const createGroup = (data, callback) => {
 // 根据id查询对应班级信息
 const getGroup = (id, callback) => {
   Group.findOne(id, {_id: 0}).then(group => {
-    let res = group.toObject()
-    delete res.__v
-    callback(res)
+    if (group) {
+      let res = group.toObject()
+      delete res.__v
+      callback(res)
+    } else {
+      callback({error: 'NO_RESULT'})
+    }
   }).catch(err => callback({error: err}))
 }
 

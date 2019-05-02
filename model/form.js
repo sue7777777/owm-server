@@ -20,21 +20,21 @@ const Form = mongoose.model('form', {
 })
 
 function getNewFormId () {
-    return new Promise((resolve, reject) => {
-        Form.find().then((res) => {
-            let lastForm, id
-            // 获取最后一份作业的id 在此基础上+1
-            if(res.length > 0) {
-                lastForm = res[res.length - 1]
-                id = lastForm.toObject().FormID
-            } else {
-                id = 0
-            }
-            resolve(id + 1)
-        }).catch((err) => {
-            reject(err)
-        })
+  return new Promise((resolve, reject) => {
+    Form.find().then((res) => {
+      let lastForm, id
+      // 获取最后一份作业的id 在此基础上+1
+      if(res.length > 0) {
+          lastForm = res[res.length - 1]
+          id = lastForm.toObject().FormID
+      } else {
+          id = 0
+      }
+      resolve(id + 1)
+    }).catch((err) => {
+      reject(err)
     })
+  })
 }
 
 // 根据用户id获取作业list (CreaterID)
@@ -66,7 +66,7 @@ const findFormByName = (query, callback) => {
 const findForm = (FormID, callback) => {
     Form.findOne(FormID, {_id: 0}).then((res) => {
         if (res === null) {
-            callback({error: '找不到作业'})
+            callback({error: 'NO_RESULT'})
         } else {
             let form = res.toObject()
             delete form.__v
@@ -114,11 +114,11 @@ const createForm = (formInfo, callback) => {
 
 // 删除作业
 const deleteForm = (FormID, callback) => {
-    Form.findOneAndDelete(FormID).then((res) => {
-        callback(res)
-    }).catch((err) => {
-        callback(err)
-    })
+  Form.findOneAndDelete(FormID).then((res) => {
+    callback(res)
+  }).catch((err) => {
+    callback(err)
+  })
 }
 
 // 更新作业

@@ -41,6 +41,7 @@ router.post('/transation/updateTransation', transationController.updateTransatio
 router.get('/transation/getStatistic', transationController.getStatistic)
 router.get('/transation/getQuestionIndexResponseList', transationController.getQuestionIndexResponseList)
 router.get('/transation/getMyTransations', transationController.getMyTransations)
+router.get('/transation/deleteTransation', transationController.deleteTransation)
 
 // file
 router.get('/file/getFile', fileController.getFile)

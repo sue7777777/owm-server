@@ -22,6 +22,24 @@ const Transation = mongoose.model('transation', {
   UpdaterID: String,      // 更新者id
 })
 
+function getNewTransationId () {
+  return new Promise((resolve, reject) => {
+    Transation.find().then((res) => {
+      let lastForm, id
+      // 获取最后一份作业的id 在此基础上+1
+      if(res.length > 0) {
+        lastForm = res[res.length - 1]
+        id = lastForm.toObject().TransationID
+      } else {
+        id = 0
+      }
+      resolve(id + 1)
+    }).catch((err) => {
+      reject(err)
+    })
+  })
+}
+
 // 根据作业id和回答的内容计算得分
 function getScore(FormID, Answers) {
   return new Promise((resolve, reject) => {
@@ -150,7 +168,7 @@ const getTransationsNumber = (FormID, callback) => {
 // 创建回复（回复时）
 const createTransation = (transationInfo, callback) => {
   formModel.findForm({FormID: transationInfo.FormID}, form => {
-    if (form) {
+    if (!form.error) {
       // 创建之前根据用户名查询是否有已经提交的回复
       Transation.findOne({FormID: transationInfo.FormID, SubmitterID: transationInfo.userName}, {_id: 0}).then(transation => {
         if (transation === null) {
@@ -158,8 +176,8 @@ const createTransation = (transationInfo, callback) => {
             callback({Form: form})
           } else {
             // 用户未创建回复
-            Transation.countDocuments({}, (err, count) => {
-              if (!err) {
+            getNewTransationId().then(id => {
+              if (id && !id.error) {
                 let time = new Date().getTime()
                 let data = {
                   CommentScore: false,
@@ -173,7 +191,7 @@ const createTransation = (transationInfo, callback) => {
                   SubmitterID: transationInfo.userName,
                   GroupID: form.GroupID,
                   Score: 0,
-                  TransationID: count+1,
+                  TransationID: id,
                   UpdateTime: time,
                   UpdaterID: transationInfo.userName
                 }
@@ -181,8 +199,8 @@ const createTransation = (transationInfo, callback) => {
                   Form: form,
                   Transation: data
                 })).catch(err => callback(err))
-              } else callback(err)
-            })
+              } else callback({error: id.error})
+            }).catch(err => callback({error: err}))
           }
         } else {
           let res = transation.toObject()
@@ -267,6 +285,10 @@ const getMyTransations = (query, callback) => {
   }))).catch(err => callback({error: err}))
 }
 
+const deleteTransation = (data, callback) => {
+  Transation.deleteOne({TransationID: data.id}).then(res => callback(res)).catch(err => callback({error: err}))
+}
+
 module.exports = {
   getTransation,
   getTransations,
@@ -275,5 +297,6 @@ module.exports = {
   updateTransation,
   getStatistic,
   getQuestionIndexResponseList,
-  getMyTransations
+  getMyTransations,
+  deleteTransation
 }

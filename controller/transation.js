@@ -202,6 +202,33 @@ const getMyTransations = (req, res) => {
   })
 }
 
+const deleteTransation = (req, res) => {
+  let {id} = req.query
+  let userName = tools.Cookie.get(req.headers.cookie, 'owm_id')
+  if (!userName) {
+    res.json({
+      code: -1,
+      msg: 'NO_LOGIN'
+    })
+  }
+
+  transationModel.deleteTransation({id: id}, deleteRes => {
+    if (deleteRes.error) {
+      res.json({
+        code: -1,
+        msg: 'FAILED',
+        error: deleteRes
+      })
+    } else {
+      res.json({
+        code: 1,
+        msg: 'SUCCESS',
+        data: deleteRes
+      })
+    }
+  })
+}
+
 module.exports = {
   getTransation,
   getTransations,
@@ -210,5 +237,6 @@ module.exports = {
   getTransationNumber,
   getQuestionIndexResponseList,
   createTransation,
-  updateTransation
+  updateTransation,
+  deleteTransation
 }
