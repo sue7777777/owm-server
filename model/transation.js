@@ -154,32 +154,36 @@ const createTransation = (transationInfo, callback) => {
       // 创建之前根据用户名查询是否有已经提交的回复
       Transation.findOne({FormID: transationInfo.FormID, SubmitterID: transationInfo.userName}, {_id: 0}).then(transation => {
         if (transation === null) {
-          // 用户未创建回复
-          Transation.countDocuments({}, (err, count) => {
-            if (!err) {
-              let time = new Date().getTime()
-              let data = {
-                CommentScore: false,
-                CreateTime: time,
-                CreaterID: transationInfo.userName,
-                DelivererID: form.CreaterID,
-                FormID: transationInfo.FormID,
-                ObjectiveAnswer: false,
-                Status: "unsubmitted",
-                SubjectiveAnswer: false,
-                SubmitterID: transationInfo.userName,
-                GroupID: form.GroupID,
-                Score: 0,
-                TransationID: count+1,
-                UpdateTime: time,
-                UpdaterID: transationInfo.userName
-              }
-              new Transation(data).save().then(res => callback({
-                Form: form,
-                Transation: data
-              })).catch(err => callback(err))
-            } else callback(err)
-          })
+          if (form.ExpireTimestamp < new Date().getTime()) {
+            callback({Form: form})
+          } else {
+            // 用户未创建回复
+            Transation.countDocuments({}, (err, count) => {
+              if (!err) {
+                let time = new Date().getTime()
+                let data = {
+                  CommentScore: false,
+                  CreateTime: time,
+                  CreaterID: transationInfo.userName,
+                  DelivererID: form.CreaterID,
+                  FormID: transationInfo.FormID,
+                  ObjectiveAnswer: false,
+                  Status: "unsubmitted",
+                  SubjectiveAnswer: false,
+                  SubmitterID: transationInfo.userName,
+                  GroupID: form.GroupID,
+                  Score: 0,
+                  TransationID: count+1,
+                  UpdateTime: time,
+                  UpdaterID: transationInfo.userName
+                }
+                new Transation(data).save().then(res => callback({
+                  Form: form,
+                  Transation: data
+                })).catch(err => callback(err))
+              } else callback(err)
+            })
+          }
         } else {
           let res = transation.toObject()
           delete res.__v
